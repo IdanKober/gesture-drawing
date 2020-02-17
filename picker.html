@@ -55,12 +55,11 @@
     function createPicker() {
       if (pickerApiLoaded && oauthToken) {
         var view = new google.picker.View(google.picker.ViewId.FOLDERS);
+        view.setSelectFolderEnabled(true);
         var picker = new google.picker.PickerBuilder()
             .setAppId(appId)
             .setOAuthToken(oauthToken)
             .addView(view)
-            .allowFolderSelect(true)
-            .addView(new google.picker.DocsUploadView())
             .setDeveloperKey(developerKey)
             .setCallback(pickerCallback)
             .build();
