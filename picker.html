@@ -59,6 +59,7 @@
             .setAppId(appId)
             .setOAuthToken(oauthToken)
             .addView(view)
+            .allowFolderSelect(true)
             .addView(new google.picker.DocsUploadView())
             .setDeveloperKey(developerKey)
             .setCallback(pickerCallback)
