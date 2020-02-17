@@ -18,7 +18,7 @@
     var appId = "600336160266";
 
     // Scope to use to access user's Drive items.
-    var scope = ['https://www.googleapis.com/auth/drive.file'];
+    var scope = ['https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly'];
 
     var pickerApiLoaded = false;
     var oauthToken;
@@ -74,6 +74,28 @@
         var fileId = data.docs[0].id;
         alert('The user selected: ' + fileId);
       }
+
+      listFiles();
+    }
+
+    /**
+     * Print files.
+     */
+    function listFiles() {
+        gapi.client.drive.files.list({
+            'pageSize': 2,
+            'fields': "nextPageToken, files(id, name)"
+        }).then(function(response) {
+            var files = response.result.files;
+            if (files && files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                alert(file.name + ' (' + file.id + ')');
+            }
+            } else {
+            alert('No files found.');
+            }
+        });
     }
     </script>
   </head>
