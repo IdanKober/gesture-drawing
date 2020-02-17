@@ -68,20 +68,10 @@
       }
     }
 
-    // A simple callback implementation.
-    function pickerCallback(data) {
-      if (data.action == google.picker.Action.PICKED) {
-        var fileId = data.docs[0].id;
-        alert('The user selected: ' + fileId);
-      }
-
-      listFiles();
-    }
-
     /**
      * Print files.
      */
-    function listFiles() {
+     function listFiles() {
         gapi.client.drive.files.list({
             'pageSize': 2,
             'fields': "nextPageToken, files(id, name)"
@@ -97,6 +87,17 @@
             }
         });
     }
+
+    // A simple callback implementation.
+    function pickerCallback(data) {
+      if (data.action == google.picker.Action.PICKED) {
+        var fileId = data.docs[0].id;
+        alert('The user selected: ' + fileId);
+      }
+
+      listFiles();
+    }
+    
     </script>
   </head>
   <body>
