@@ -13,6 +13,9 @@
     // The Client ID obtained from the Google API Console. Replace with your own Client ID.
     var clientId = "600336160266-hkamin8jh7209c9quit1rj8a5910gusp.apps.googleusercontent.com"
 
+    // Array of API discovery doc URLs for APIs used by the quickstart
+    var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+
     // Replace with your own project number from console.developers.google.com.
     // See "Project number" under "IAM & Admin" > "Settings"
     var appId = "600336160266";
@@ -72,19 +75,28 @@
      * Print files.
      */
      function listFiles() {
-        gapi.client.drive.files.list({
+        gapi.client.init({
+          apiKey: developerKey,
+          clientId: clientId,
+          discoveryDocs: DISCOVERY_DOCS,
+          scope: scope
+        }).then(function () {
+            gapi.client.drive.files.list({
             'pageSize': 2,
             'fields': "nextPageToken, files(id, name)"
-        }).then(function(response) {
-            var files = response.result.files;
-            if (files && files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                alert(file.name + ' (' + file.id + ')');
-            }
-            } else {
-            alert('No files found.');
-            }
+            }).then(function(response) {
+                var files = response.result.files;
+                if (files && files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    alert(file.name + ' (' + file.id + ')');
+                }
+                } else {
+                alert('No files found.');
+                }
+            });
+        }, function(error) {
+          alert(JSON.stringify(error, null, 2));
         });
     }
 
@@ -97,13 +109,15 @@
 
       listFiles();
     }
-    
+
     </script>
   </head>
   <body>
     <div id="result"></div>
 
     <!-- The Google API Loader script. -->
+    <script async defer src="https://apis.google.com/js/api.js">
+    </script>
     <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=loadPicker"></script>
   </body>
 </html>
