@@ -3,18 +3,46 @@
   <head>
     <title>Drive API Quickstart</title>
     <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <link href="node_modules/jsoneditor/dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
+    <script src="node_modules/jsoneditor/dist/jsoneditor.min.js"></script>
   </head>
   <body>
     <p>Drive API Quickstart</p>
 
     <!--Add buttons to initiate auth sequence and sign out-->
+    <div id="jsoneditor" style="width: 400px; height: 400px;"></div>
     <button id="authorize_button" style="display: none;">Authorize</button>
     <button id="show_picker" onclick="createPicker()">Show Picker</button>
+    <button id="start_slideshow" onclick="startSession()">Start Slideshow</button>
     <button id="signout_button" style="display: none;">Sign Out</button>
-
-    <pre id="content" style="white-space: pre-wrap;"></pre>
+    <img id="slideshow_image" height=100% width="100%" />
 
     <script type="text/javascript">
+
+      // create the editor
+      const container = document.getElementById("jsoneditor")
+      const options = {
+        mode: "code"
+      }
+      const editor = new JSONEditor(container, options)
+
+      // set json
+      const initialJson = {
+          session: [
+            {
+              "type": "slideshow",
+              "images_to_show": 10,
+              "time_per_image": 3000,
+              "time_between_images": 1000
+            }
+          ]
+      }
+      editor.set(initialJson);
+
+      var session = editor.get();
+      var actionsQueue = [];
+
       // Client ID and API key from the Developer Console
       var CLIENT_ID = '600336160266-hkamin8jh7209c9quit1rj8a5910gusp.apps.googleusercontent.com';
       var API_KEY = 'AIzaSyDxvW8B8uLgJdpodYldqXyX_umff3Tnf3w';
@@ -94,40 +122,6 @@
         gapi.auth2.getAuthInstance().signOut();
       }
 
-      /**
-       * Append a pre element to the body containing the given message
-       * as its text node. Used to display the results of the API call.
-       *
-       * @param {string} message Text to be placed in pre element.
-       */
-      function appendPre(message) {
-        var pre = document.getElementById('content');
-        var textContent = document.createTextNode(message + '\n');
-        pre.appendChild(textContent);
-      }
-
-      /**
-       * Print files.
-       */
-      function listFiles(folderId) {
-        gapi.client.drive.files.list({
-          'pageSize': 10,
-          'fields': "nextPageToken, files(id, name)",
-          'q': "'" + folderId + "' in parents and mimeType = 'image/jpeg'"
-        }).then(function(response) {
-          appendPre('Files:');
-          var files = response.result.files;
-          if (files && files.length > 0) {
-            for (var i = 0; i < files.length; i++) {
-              var file = files[i];
-              appendPre(file.name + ' (' + file.id + ')');
-            }
-          } else {
-            appendPre('No files found.');
-          }
-        });
-      }
-
       //TODO: Retrieve all files in all child directories
       function retrieveAllFiles(folderId, callback) {
         var retrievePageOfFiles = function(request, result) {
@@ -155,18 +149,6 @@
         retrievePageOfFiles(initialRequest, []);
       }
 
-      function foo() {
-        appendPre('Files:');
-        if (files && files.length > 0) {
-          for (var i = 0; i < files.length; i++) {
-            var file = files[i];
-            appendPre(file.name + ' (' + file.id + ')');
-          }
-        } else {
-          appendPre('No files found.');
-        }
-      }
-
       // Create and render a Picker object for searching images.
       function createPicker() {
         var view = new google.picker.DocsView()
@@ -187,7 +169,65 @@
       function pickerCallback(data) {
         if (data.action == google.picker.Action.PICKED) {
           var fileId = data.docs[0].id;
-          retrieveAllFiles(fileId, foo)
+          retrieveAllFiles(fileId, doneRetrievingAllFiles)
+        }
+      }
+
+      function doneRetrievingAllFiles() {
+        console.log("all files retrieved");
+      }
+
+      function createQueueFromSessionJSON() {
+        let session = editor.get().session;
+        let queue = [];
+
+        session.forEach(section => {
+          if (section.type = "slideshow") {
+            for (let index = 0; index < section.images_to_show; index++) {
+              queue.push({
+                type: "image",
+                time: section.time_per_image
+              });
+              queue.push({
+                type: "break",
+                text: "get ready for next image",
+                time: section.time_between_images
+              });
+            }
+          }
+        });
+
+        return queue;
+      }
+
+      function showImage(imageConfiguration) {
+        const imageId = files[Math.floor(Math.random() * files.length)].id;
+        console.log("show image: " + imageId);
+
+        document.getElementById("slideshow_image").src = "https://drive.google.com/uc?id=" + imageId;
+        setTimeout(nextAction, imageConfiguration.time);
+      }
+
+      function breakTime(breakConfiguration) {
+        console.log("break time: " + breakConfiguration.text)
+
+        setTimeout(nextAction, breakConfiguration.time);
+      }
+
+      function startSession() {
+        actionsQueue = createQueueFromSessionJSON();
+        nextAction();
+      }
+
+      function nextAction() {
+        if (actionsQueue.length > 0) {
+          const nextAction = actionsQueue.shift();
+
+          if (nextAction.type == "image") {
+            showImage(nextAction);
+          } else if (nextAction.type == "break") {
+            breakTime(nextAction);
+          }
         }
       }
 
