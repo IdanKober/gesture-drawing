@@ -13,15 +13,12 @@
     // The Client ID obtained from the Google API Console. Replace with your own Client ID.
     var clientId = "600336160266-hkamin8jh7209c9quit1rj8a5910gusp.apps.googleusercontent.com"
 
-    // Array of API discovery doc URLs for APIs used by the quickstart
-    var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
-
     // Replace with your own project number from console.developers.google.com.
     // See "Project number" under "IAM & Admin" > "Settings"
-    var appId = "600336160266";
+    var appId = "1234567890";
 
     // Scope to use to access user's Drive items.
-    var scope = ['https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly'];
+    var scope = ['https://www.googleapis.com/auth/drive.file'];
 
     var pickerApiLoaded = false;
     var oauthToken;
@@ -57,47 +54,20 @@
     // Create and render a Picker object for searching images.
     function createPicker() {
       if (pickerApiLoaded && oauthToken) {
-        var view = new google.picker.DocsView(google.picker.ViewId.DOCS);
-        view.setSelectFolderEnabled(true);
-        view.setIncludeFolders(true);
+        var view = new google.picker.View(google.picker.ViewId.DOCS);
+        view.setMimeTypes("image/png,image/jpeg,image/jpg");
         var picker = new google.picker.PickerBuilder()
+            .enableFeature(google.picker.Feature.NAV_HIDDEN)
+            .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
             .setAppId(appId)
             .setOAuthToken(oauthToken)
             .addView(view)
+            .addView(new google.picker.DocsUploadView())
             .setDeveloperKey(developerKey)
             .setCallback(pickerCallback)
             .build();
          picker.setVisible(true);
       }
-    }
-
-    /**
-     * Print files.
-     */
-     function listFiles() {
-        gapi.client.init({
-          apiKey: developerKey,
-          clientId: clientId,
-          discoveryDocs: DISCOVERY_DOCS,
-          scope: scope
-        }).then(function () {
-            gapi.client.drive.files.list({
-            'pageSize': 2,
-            'fields': "nextPageToken, files(id, name)"
-            }).then(function(response) {
-                var files = response.result.files;
-                if (files && files.length > 0) {
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
-                    alert(file.name + ' (' + file.id + ')');
-                }
-                } else {
-                alert('No files found.');
-                }
-            });
-        }, function(error) {
-          alert(JSON.stringify(error, null, 2));
-        });
     }
 
     // A simple callback implementation.
@@ -106,18 +76,13 @@
         var fileId = data.docs[0].id;
         alert('The user selected: ' + fileId);
       }
-
-      listFiles();
     }
-
     </script>
   </head>
   <body>
     <div id="result"></div>
 
     <!-- The Google API Loader script. -->
-    <script async defer src="https://apis.google.com/js/api.js">
-    </script>
     <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=loadPicker"></script>
   </body>
 </html>
