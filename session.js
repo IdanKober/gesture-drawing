@@ -4,6 +4,7 @@ var slideshow_image = document.getElementById("slideshow_image");
 var actionProgressBar;
 
 function startSession() {
+    fullScreen();
     actionsQueue = createQueueFromSessionJSON();
 
     startASessionDiv.style.display = "none";
