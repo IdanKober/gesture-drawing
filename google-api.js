@@ -88,18 +88,19 @@ function retrieveAllFiles(folderId, callback) {
       if (nextPageToken) {
         request = gapi.client.drive.files.list({
           'pageToken': nextPageToken,
-          'pageSize': 10,
+          'pageSize': 100,
           'fields': "nextPageToken, files(id, name)",
           'q': "'" + folderId + "' in parents and mimeType = 'image/jpeg'"
         });
         retrievePageOfFiles(request, files);
+        numberOfFilesSpan.innerText = files.length + " images found"
       } else {
         callback();
       }
     });
   }
   var initialRequest = gapi.client.drive.files.list({
-    'pageSize': 10,
+    'pageSize': 100,
     'fields': "nextPageToken, files(id, name)",
     'q': "'" + folderId + "' in parents and mimeType = 'image/jpeg'"
   });

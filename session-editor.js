@@ -10,9 +10,9 @@
      session: [
        {
          "type": "slideshow",
-         "images_to_show": 10,
-         "time_per_image": 3000,
-         "time_between_images": 1000
+         "images_to_show": 20,
+         "time_per_image": 30,
+         "time_between_images": 1
        }
      ]
  }
