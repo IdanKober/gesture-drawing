@@ -1,11 +1,18 @@
 var startASessionDiv = document.getElementById("start-a-session");
 var sessionDiv = document.getElementById("session");
+var slideshow_image = document.getElementById("slideshow_image");
+var actionProgressBar;
 
 function startSession() {
     actionsQueue = createQueueFromSessionJSON();
 
     startASessionDiv.style.display = "none";
     sessionDiv.style.display = "block";
+
+    actionProgressBar = new ProgressBar.Circle('#action-progress-bar', {
+        strokeWidth: 2,
+        color: '#FFFFFF'
+    });
 
     nextAction();
 }
@@ -47,14 +54,17 @@ function nextAction() {
 
 function showImage(imageConfiguration) {
     const imageId = files[Math.floor(Math.random() * files.length)].id;
-    console.log("show image: " + imageId);
-
-    document.getElementById("slideshow_image").src = "https://drive.google.com/uc?id=" + imageId;
-    setTimeout(nextAction, imageConfiguration.time * 1000);
+    
+    slideshow_image.src = "https://drive.google.com/uc?id=" + imageId;
+    slideshow_image.onload = function () {
+        actionProgressBar.set(0);
+        actionProgressBar.animate(1, {duration: imageConfiguration.time * 1000});
+        setTimeout(nextAction, imageConfiguration.time * 1000);
+    };
 }
 
 function breakTime(breakConfiguration) {
-    console.log("break time: " + breakConfiguration.text)
-
+    slideshow_image.src = "";
+    actionProgressBar.set(0);
     setTimeout(nextAction, breakConfiguration.time * 1000);
 }

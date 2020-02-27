@@ -10,19 +10,16 @@
     <link href="jsoneditor/jsoneditor.min.css" rel="stylesheet" type="text/css">
     <link href="index.css" rel="stylesheet" type="text/css">
     <script src="jsoneditor/jsoneditor.min.js"></script>
+    <script src="progressbar/progressbar.min.js"></script>
     <title>Gesture Drawing</title>
   </head>
   <body>
     <div class="d-flex flex-column" style="height: 100%">
         <nav class="navbar navbar-dark bg-dark">
-            <a class="navbar-brand" href="#">Gesture Drawing</a>
-            <div class="w-25">
-                <div class="progress">
-                    <div class="progress-bar bg-secondary" role="progressbar" style="width: 75%"></div>
-                </div>
-            </div>
-            <button id="sign-in-button" class="btn my-2 btn-secondary">Sign In</button>
-            <button id="sign-out-button" class="btn my-2 btn-secondary" style="display: none;">Sign Out</button>
+            <a class="text-light" href="#">Gesture Drawing</a>
+            <div id="action-progress-bar" style="width: 25px; height: 25px;"></div>
+            <button id="sign-in-button" class="btn my-0.5 btn-secondary btn-sm">Sign In</button>
+            <button id="sign-out-button" class="btn my-0.5 btn-secondary  btn-sm" style="display: none;">Sign Out</button>
         </nav>
 
         <div id="start-a-session" class="container pt-5" style="display:visible">
@@ -43,7 +40,7 @@
             </div>
         </div>
         <div id="session" class="bg-dark text-center" style="height: 100%; display: none">
-            <img id="slideshow_image" src="https://drive.google.com/uc?id=1YQLO7HvwFtLZwvnW6iOAlFpyKrLyVfIT" style="max-height: 100%">
+            <img id="slideshow_image" style="max-height: 100%">
         </div>
     </div>
     

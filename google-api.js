@@ -19,6 +19,8 @@ var numberOfFilesSpan = document.getElementById('number-of-files');
 var oauthToken;
 
 var files = [];
+var folders = [];
+var tempFolders = [];
 
 /**
  *  On load, called to load the auth2 library and API client library.
@@ -79,32 +81,54 @@ function handleSignoutClick(event) {
   gapi.auth2.getAuthInstance().signOut();
 }
 
-//TODO: Retrieve all files in all child directories
-function retrieveAllFiles(folderId, callback) {
-  var retrievePageOfFiles = function(request, result) {
+function retrieveAllFiles(folderId, mimeType, pageHandler, doneHandler) {
+  var retrievePageOfFiles = function(request) {
     request.execute(function(resp) {
-      files = files.concat(resp.files);
+      pageHandler(resp.files);
       var nextPageToken = resp.nextPageToken;
       if (nextPageToken) {
         request = gapi.client.drive.files.list({
           'pageToken': nextPageToken,
           'pageSize': 100,
           'fields': "nextPageToken, files(id, name)",
-          'q': "'" + folderId + "' in parents and mimeType = 'image/jpeg'"
+          'q': "'" + folderId + "' in parents and mimeType = '" + mimeType + "'"
         });
-        retrievePageOfFiles(request, files);
-        numberOfFilesSpan.innerText = files.length + " images found"
+        retrievePageOfFiles(request);
       } else {
-        callback();
+        doneHandler();
       }
     });
   }
+  
   var initialRequest = gapi.client.drive.files.list({
     'pageSize': 100,
     'fields': "nextPageToken, files(id, name)",
-    'q': "'" + folderId + "' in parents and mimeType = 'image/jpeg'"
+    'q': "'" + folderId + "' in parents and mimeType = '" + mimeType + "'"
   });
-  retrievePageOfFiles(initialRequest, []);
+  retrievePageOfFiles(initialRequest);
+}
+
+function filesPageRetrieved(pageFiles) {
+  files = files.concat(pageFiles);
+  numberOfFilesSpan.innerText = files.length + " images found";
+}
+
+function retrieveAllFolersRecursively(doneHandler) {
+  if (tempFolders.length > 0) {
+    var currentFolder = tempFolders.pop();
+    retrieveAllFiles(currentFolder.id, 
+      "application/vnd.google-apps.folder", 
+      function (pageFolders) {
+        console.log(pageFolders.length + " sub folders found");
+        folders = folders.concat(pageFolders);
+        tempFolders = tempFolders.concat(pageFolders)
+      }, function () {
+        retrieveAllFolersRecursively(doneHandler);
+      }
+    );
+  } else {
+    doneHandler();
+  }
 }
 
 // Create and render a Picker object for searching images.
@@ -116,6 +140,7 @@ function createPicker() {
     
   var picker = new google.picker.PickerBuilder()
       .enableFeature(google.picker.Feature.NAV_HIDDEN)
+      .setTitle("Select a folder")
       .setOAuthToken(gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse(true).access_token)
       .addView(view)
       .setCallback(pickerCallback)
@@ -125,18 +150,36 @@ function createPicker() {
 
 function pickerCallback(data) {
   if (data.action == google.picker.Action.PICKED) {
-    var fileId = data.docs[0].id;
+    var folderId = data.docs[0].id;
     
     selectFolderButtonSpinner.style.display = "inline-block";
     selectFolderButton.disabled = true;
 
-    retrieveAllFiles(fileId, doneRetrievingAllFiles)
+    //retrieveAllFiles(folderId, "image/jpeg", filesPageRetrieved, doneRetrievingAllFiles)
+    folders.push({id: folderId});
+    tempFolders.push({id: folderId});
+    retrieveAllFolersRecursively(function () {retrieveAllFilesForAllFolders(doneRetrievingAllFiles);});
+  }
+}
+
+function retrieveAllFilesForAllFolders(doneHandler) {
+  if (folders.length > 0) {
+    var currentFolder = folders.pop();
+    retrieveAllFiles(currentFolder.id, 
+      "image/jpeg", 
+      filesPageRetrieved,
+      function () {
+        retrieveAllFilesForAllFolders(doneHandler);
+      }
+    );
+  } else {
+    doneHandler();
   }
 }
 
 function doneRetrievingAllFiles() {
     selectFolderButton.disabled = false;
     selectFolderButtonSpinner.style.display = "none";
-    numberOfFilesSpan.innerText = files.length + " images found"
+
     console.log("all files retrieved");
 }
