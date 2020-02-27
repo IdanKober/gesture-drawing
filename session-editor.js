@@ -20,4 +20,3 @@
 
  var session = editor.get();
  var actionsQueue = [];
-

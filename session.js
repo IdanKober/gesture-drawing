@@ -17,6 +17,21 @@ function startSession() {
     nextAction();
 }
 
+function fullScreen() {
+    const _element = document.documentElement;
+    if (_element.requestFullscreen) {
+      _element.requestFullscreen();
+    } else {
+      if (_element.mozRequestFullScreen) {
+        _element.mozRequestFullScreen();
+      } else {
+        if (_element.webkitRequestFullscreen) {
+          _element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        }
+      }
+    }
+    //https://bubblin.io/blog/fullscreen-api-ipad
+}
 function createQueueFromSessionJSON() {
     let session = editor.get().session;
     let queue = [];
