@@ -17,7 +17,12 @@
     <div class="d-flex flex-column" style="height: 100%">
         <nav class="navbar navbar-dark bg-dark">
             <a class="text-light" href="#">Gesture Drawing</a>
-            <div id="action-progress-bar" style="width: 25px; height: 25px;"></div>
+            <div class="dropdown">
+              <a href="#" data-toggle="dropdown"><div id="action-progress-bar"  style="width: 25px; height: 25px;"></div></a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="#" onclick="skipAction()">Skip</a>
+              </div>
+            </div>
             <button id="sign-in-button" class="btn my-0.5 btn-secondary btn-sm">Sign In</button>
             <button id="sign-out-button" class="btn my-0.5 btn-secondary btn-sm" style="display: none;">Sign Out</button>
         </nav>

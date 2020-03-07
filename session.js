@@ -47,30 +47,35 @@ function createQueueFromSessionJSON() {
   }
 
 function nextAction() {
-    if (actionsQueue.length > 0) {
-        const nextAction = actionsQueue.shift();
+  if (actionsQueue.length > 0) {
+      const nextAction = actionsQueue.shift();
 
-        if (nextAction.type == "image") {
-            showImage(nextAction);
-        } else if (nextAction.type == "break") {
-            breakTime(nextAction);
-        }
-    }
+      if (nextAction.type == "image") {
+          showImage(nextAction);
+      } else if (nextAction.type == "break") {
+          breakTime(nextAction);
+      }
+  }
 }
 
 function showImage(imageConfiguration) {
-    const imageId = files[Math.floor(Math.random() * files.length)].id;
-    
-    slideshow_image.src = "https://drive.google.com/uc?id=" + imageId;
-    slideshow_image.onload = function () {
-        actionProgressBar.set(0);
-        actionProgressBar.animate(1, {duration: imageConfiguration.time * 1000});
-        currentTimeoutId = setTimeout(nextAction, imageConfiguration.time * 1000);
-    };
+  const imageId = files[Math.floor(Math.random() * files.length)].id;
+  
+  slideshow_image.src = "https://drive.google.com/uc?id=" + imageId;
+  slideshow_image.onload = function () {
+      actionProgressBar.set(0);
+      actionProgressBar.animate(1, {duration: imageConfiguration.time * 1000});
+      currentTimeoutId = setTimeout(nextAction, imageConfiguration.time * 1000);
+  };
 }
 
 function breakTime(breakConfiguration) {
-    slideshow_image.src = "";
-    actionProgressBar.set(0);
-    currentTimeoutId = setTimeout(nextAction, breakConfiguration.time * 1000);
+  slideshow_image.src = "";
+  actionProgressBar.set(0);
+  currentTimeoutId = setTimeout(nextAction, breakConfiguration.time * 1000);
+}
+
+function skipAction() {
+  clearTimeout(currentTimeoutId);
+  nextAction();
 }
