@@ -2,8 +2,10 @@ var startASessionDiv = document.getElementById("start-a-session");
 var sessionDiv = document.getElementById("session");
 var slideshow_image = document.getElementById("slideshow_image");
 var actionProgressBar;
+var currentTimeoutId;
 
 function startSession() {
+    saveSettingsToLocalStorage();
     actionsQueue = createQueueFromSessionJSON();
 
     startASessionDiv.style.display = "none";
@@ -15,6 +17,10 @@ function startSession() {
     });
 
     nextAction();
+}
+
+function saveSettingsToLocalStorage() {
+  localStorage.setItem("sessionJSON", JSON.stringify(editor.get()));
 }
 
 function createQueueFromSessionJSON() {
@@ -59,12 +65,12 @@ function showImage(imageConfiguration) {
     slideshow_image.onload = function () {
         actionProgressBar.set(0);
         actionProgressBar.animate(1, {duration: imageConfiguration.time * 1000});
-        setTimeout(nextAction, imageConfiguration.time * 1000);
+        currentTimeoutId = setTimeout(nextAction, imageConfiguration.time * 1000);
     };
 }
 
 function breakTime(breakConfiguration) {
     slideshow_image.src = "";
     actionProgressBar.set(0);
-    setTimeout(nextAction, breakConfiguration.time * 1000);
+    currentTimeoutId = setTimeout(nextAction, breakConfiguration.time * 1000);
 }

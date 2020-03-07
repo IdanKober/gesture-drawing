@@ -78,6 +78,7 @@ function handleAuthClick(event) {
  *  Sign out the user upon button click.
  */
 function handleSignoutClick(event) {
+  localStorage.clear();
   gapi.auth2.getAuthInstance().signOut();
 }
 

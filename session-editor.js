@@ -16,7 +16,12 @@
        }
      ]
  }
- editor.set(initialJson);
+
+if (localStorage.getItem("sessionJSON")) {
+  editor.set(JSON.parse(localStorage.getItem("sessionJSON")));
+} else {
+  editor.set(initialJson);
+}
 
  var session = editor.get();
  var actionsQueue = [];
