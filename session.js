@@ -22,7 +22,7 @@ function startSession() {
     });
 
     nextAction();
-}
+} 
 
 function initSkippedImages() {
   if (localStorage.getItem("skippedImages")) {
