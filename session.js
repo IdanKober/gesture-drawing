@@ -40,6 +40,11 @@ function createQueueFromSessionJSON() {
 
   session.forEach(section => {
     if (section.type = "slideshow") {
+      queue.push({
+        type: "toast",
+        text: "Time per image: " + section.time_per_image
+      });
+
       for (let index = 0; index < section.images_to_show; index++) {
         queue.push({
           type: "image",
@@ -65,8 +70,17 @@ function nextAction() {
           showImage(currentAction);
       } else if (currentAction.type == "break") {
           breakTime(currentAction);
+      } else if (currentAction.type == "toast") {
+          showToast(currentAction);
       }
   }
+}
+
+function showToast(toastConfiguration) {
+  $('#mytoast-text').innerText = toastConfiguration.text;
+  $('#mytoast').toast('show');
+
+  nextAction();
 }
 
 function showImage(imageConfiguration) {

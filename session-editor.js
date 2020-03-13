@@ -47,3 +47,5 @@ refreshTotalTime(editor.getText());
 
 var session = editor.get();
 var actionsQueue = [];
+
+$('.toast').toast({delay: 5000});
