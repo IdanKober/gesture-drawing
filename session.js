@@ -39,10 +39,10 @@ function createQueueFromSessionJSON() {
   let queue = [];
 
   session.forEach(section => {
-    if (section.type = "slideshow") {
+    if (section.type == "slideshow") {
       queue.push({
         type: "toast",
-        text: "Time per image: " + section.time_per_image
+        text: "Time per image: " + section.time_per_image + " seconds"
       });
 
       for (let index = 0; index < section.images_to_show; index++) {
@@ -77,7 +77,7 @@ function nextAction() {
 }
 
 function showToast(toastConfiguration) {
-  $('#mytoast-text').innerText = toastConfiguration.text;
+  document.getElementById("mytoast-text").innerText = toastConfiguration.text;
   $('#mytoast').toast('show');
 
   nextAction();
